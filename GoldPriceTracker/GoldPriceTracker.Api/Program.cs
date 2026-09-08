@@ -9,6 +9,7 @@ builder.Services.AddControllers();
 builder.Services.AddOpenApi();
 
 builder.Services.AddHostedService<GoldPriceBackgroundService>();
+ 
 
 var app = builder.Build();
 
