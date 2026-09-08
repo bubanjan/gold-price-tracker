@@ -1,4 +1,6 @@
-﻿namespace GoldPriceTracker.Api.Services
+﻿using GoldPriceTracker.Api.Models;
+
+namespace GoldPriceTracker.Api.Services
 {
     public class GoldApiClient
     {
@@ -9,14 +11,10 @@
             _httpClient = httpClient;
         }
 
-        public async Task<string> GetGoldPriceAsync(
+        public async Task<GoldPriceResponse?> GetGoldPriceAsync(
             CancellationToken cancellationToken)
         {
-            var response = await _httpClient.GetAsync("https://api.gold-api.com/price/XAU", cancellationToken);
-
-            response.EnsureSuccessStatusCode();
-
-            return await response.Content.ReadAsStringAsync(cancellationToken);
+            return await _httpClient.GetFromJsonAsync<GoldPriceResponse>("https://api.gold-api.com/price/XAU", cancellationToken);
         }
     }
 }

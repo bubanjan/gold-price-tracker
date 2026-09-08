@@ -15,9 +15,13 @@
 
             while (await timer.WaitForNextTickAsync(stoppingToken))
             {
-                var result = await _goldApiClient.GetGoldPriceAsync(stoppingToken);
+                var goldPrice = await _goldApiClient.GetGoldPriceAsync(stoppingToken);
 
-                Console.WriteLine(result);
+                if (goldPrice != null)
+                {
+                    Console.WriteLine($"Gold price: {goldPrice.CurrencySymbol}{goldPrice.Price} {goldPrice.Currency}");
+                }
+
             }
         }
     }
