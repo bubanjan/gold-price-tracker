@@ -9,8 +9,8 @@ builder.Services.AddControllers();
 builder.Services.AddOpenApi();
 
 builder.Services.AddHttpClient<GoldApiClient>();
-
 builder.Services.AddHostedService<GoldPriceBackgroundService>();
+builder.Services.AddSingleton<GoldPriceStore>();
 
 var app = builder.Build();
 

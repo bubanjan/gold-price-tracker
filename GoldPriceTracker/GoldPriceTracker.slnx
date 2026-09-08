@@ -1,3 +1,7 @@
 <Solution>
   <Project Path="GoldPriceTracker.Api/GoldPriceTracker.Api.csproj" />
+  <Project Path="GoldPriceTrackerFrontend/GoldPriceTrackerFrontend.esproj">
+    <Build />
+    <Deploy />
+  </Project>
 </Solution>
