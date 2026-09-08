@@ -12,7 +12,7 @@
         public async Task<string> GetGoldPriceAsync(
             CancellationToken cancellationToken)
         {
-            var response = await _httpClient.GetAsync("THE_API_URL_HERE", cancellationToken);
+            var response = await _httpClient.GetAsync("https://api.gold-api.com/price/XAU", cancellationToken);
 
             response.EnsureSuccessStatusCode();
 
