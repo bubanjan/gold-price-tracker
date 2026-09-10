@@ -1,6 +1,8 @@
-﻿using GoldPriceTracker.Api.Services;
-using Microsoft.AspNetCore.Http;
+﻿using GoldPriceTracker.Api.Data;
+using GoldPriceTracker.Api.Models;
+using GoldPriceTracker.Api.Services;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace GoldPriceTracker.Api.Controllers
 {
@@ -9,10 +11,12 @@ namespace GoldPriceTracker.Api.Controllers
     public class GoldPriceController : ControllerBase
     {
         private readonly GoldPriceStore _goldPriceStore;
+        private readonly AppDbContext _dbContext;
 
-        public GoldPriceController(GoldPriceStore goldPriceStore)
+        public GoldPriceController(GoldPriceStore goldPriceStore, AppDbContext dbContext)
         {
             _goldPriceStore = goldPriceStore;
+            _dbContext = dbContext;
         }
 
         [HttpGet]
@@ -24,6 +28,31 @@ namespace GoldPriceTracker.Api.Controllers
             }
 
             return Ok(_goldPriceStore.Current);
+        }
+
+        [HttpGet("history")]
+        public async Task<IActionResult> GetHistory([FromQuery] int page = 1, [FromQuery] int pageSize = 20)
+        {
+            var totalCount = await _dbContext.GoldPrices.CountAsync();
+
+            var history = await _dbContext.GoldPrices
+             .OrderByDescending(x => x.FetchedAt)
+             .Skip((page - 1) * pageSize)
+             .Take(pageSize)
+             .ToListAsync();
+
+            var totalPages = (int)Math.Ceiling(totalCount / (double)pageSize);
+
+            var response = new GoldPriceHistoryResponse
+            {
+                Items = history,
+                Page = page,
+                PageSize = pageSize,
+                TotalCount = totalCount,
+                TotalPages = totalPages
+            };
+
+            return Ok(response);
         }
     }
 }
