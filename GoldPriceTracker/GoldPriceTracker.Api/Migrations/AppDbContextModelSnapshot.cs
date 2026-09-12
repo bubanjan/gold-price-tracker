@@ -44,6 +44,36 @@ namespace GoldPriceTracker.Api.Migrations
 
                     b.ToTable("GoldPrices");
                 });
+
+            modelBuilder.Entity("GoldPriceTracker.Api.Entities.PriceAlert", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("Condition")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("TEXT");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<bool>("IsTriggered")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<decimal>("TargetPrice")
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime?>("TriggeredAt")
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("PriceAlerts");
+                });
 #pragma warning restore 612, 618
         }
     }

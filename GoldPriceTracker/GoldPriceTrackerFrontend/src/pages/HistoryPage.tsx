@@ -1,5 +1,5 @@
 
-import { useQuery } from '@tanstack/react-query';
+import { keepPreviousData, useQuery } from '@tanstack/react-query';
 import { Link } from 'react-router';
 import {
     Button,
@@ -20,10 +20,13 @@ function HistoryPage() {
         data,
         isLoading,
         isError,
+        isFetching,
     } = useQuery({
         queryKey: ['goldPriceHistory', page, pageSize],
         queryFn: () => getGoldPriceHistory(page, pageSize),
+        placeholderData: keepPreviousData,
     });
+
 
     if (isLoading) {
         return (
@@ -57,6 +60,10 @@ function HistoryPage() {
             <Typography variant="h4" gutterBottom>
                 Gold Price History
             </Typography>
+
+
+            {isFetching && <CircularProgress size={20} />}
+
 
             {data?.items.map((item) => (
                 <Typography key={item.id}>
