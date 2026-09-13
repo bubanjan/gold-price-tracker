@@ -1,20 +1,36 @@
-
-import { keepPreviousData, useQuery } from '@tanstack/react-query';
+import { useState } from 'react';
 import { Link } from 'react-router';
 import {
     Button,
     CircularProgress,
     Container,
+    Dialog,
+    DialogActions,
+    DialogContent,
+    DialogContentText,
+    DialogTitle,
     Pagination,
     Typography
 } from '@mui/material';
-import { getGoldPriceHistory } from '../api/goldPriceApi';
-import { useState } from 'react';
+import {
+    keepPreviousData,
+    useMutation,
+    useQuery,
+    useQueryClient
+} from '@tanstack/react-query';
+
+import {
+    deleteGoldPriceHistory,
+    getGoldPriceHistory
+} from '../api/goldPriceApi';
 
 function HistoryPage() {
-
     const [page, setPage] = useState(1);
+    const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+
     const pageSize = 20;
+
+    const queryClient = useQueryClient();
 
     const {
         data,
@@ -27,6 +43,17 @@ function HistoryPage() {
         placeholderData: keepPreviousData,
     });
 
+    const deleteHistoryMutation = useMutation({
+        mutationFn: deleteGoldPriceHistory,
+
+        onSuccess: () => {
+            queryClient.invalidateQueries({
+                queryKey: ['goldPriceHistory']
+            });
+
+            setPage(1);
+        },
+    });
 
     if (isLoading) {
         return (
@@ -57,13 +84,22 @@ function HistoryPage() {
                 Back to Current Price
             </Button>
 
+            <Button
+                sx={{ mb: 2, ml: 1 }}
+                color="error"
+                variant="outlined"
+                onClick={() => setDeleteDialogOpen(true)}
+            >
+                Clear History
+            </Button>
+
             <Typography variant="h4" gutterBottom>
                 Gold Price History
             </Typography>
 
-
-            {isFetching && <CircularProgress size={20} />}
-
+            {isFetching && (
+                <CircularProgress size={20} />
+            )}
 
             {data?.items.map((item) => (
                 <Typography key={item.id}>
@@ -78,6 +114,43 @@ function HistoryPage() {
                 onChange={(_, value) => setPage(value)}
                 sx={{ mt: 3 }}
             />
+
+            <Dialog
+                open={deleteDialogOpen}
+                onClose={() => setDeleteDialogOpen(false)}
+            >
+                <DialogTitle>
+                    Clear gold price history?
+                </DialogTitle>
+
+                <DialogContent>
+                    <DialogContentText>
+                        This will permanently delete all saved gold price
+                        history. This action cannot be undone.
+                    </DialogContentText>
+                </DialogContent>
+
+                <DialogActions>
+                    <Button
+                        onClick={() => setDeleteDialogOpen(false)}
+                    >
+                        Cancel
+                    </Button>
+
+                    <Button
+                        color="error"
+                        onClick={() => {
+                            deleteHistoryMutation.mutate();
+                            setDeleteDialogOpen(false);
+                        }}
+                        disabled={deleteHistoryMutation.isPending}
+                    >
+                        {deleteHistoryMutation.isPending
+                            ? 'Deleting...'
+                            : 'Delete'}
+                    </Button>
+                </DialogActions>
+            </Dialog>
         </Container>
     );
 }

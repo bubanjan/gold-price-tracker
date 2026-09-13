@@ -86,8 +86,6 @@ namespace GoldPriceTracker.Api.Services
                         Console.WriteLine($"Saved gold price with ID: {entity.Id}");
                     }
 
-                    Console.WriteLine($"Saved gold price with ID: {entity.Id}");
-
                     Console.WriteLine($"Gold price: {goldPrice.CurrencySymbol}{goldPrice.Price} {goldPrice.Currency}");
 
                 }

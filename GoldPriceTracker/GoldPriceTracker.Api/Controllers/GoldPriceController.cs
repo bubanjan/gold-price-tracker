@@ -31,15 +31,18 @@ namespace GoldPriceTracker.Api.Controllers
         }
 
         [HttpGet("history")]
-        public async Task<IActionResult> GetHistory([FromQuery] int page = 1, [FromQuery] int pageSize = 20)
+        public async Task<IActionResult> GetHistory(
+            CancellationToken cancellationToken, 
+            [FromQuery] int page = 1, 
+            [FromQuery] int pageSize = 20)
         {
-            var totalCount = await _dbContext.GoldPrices.CountAsync();
+            var totalCount = await _dbContext.GoldPrices.CountAsync(cancellationToken);
 
             var history = await _dbContext.GoldPrices
              .OrderByDescending(x => x.FetchedAt)
              .Skip((page - 1) * pageSize)
              .Take(pageSize)
-             .ToListAsync();
+             .ToListAsync(cancellationToken);
 
             var totalPages = (int)Math.Ceiling(totalCount / (double)pageSize);
 
@@ -53,6 +56,14 @@ namespace GoldPriceTracker.Api.Controllers
             };
 
             return Ok(response);
+        }
+
+        [HttpDelete("history")]
+        public async Task<IActionResult> DeleteHistory(CancellationToken cancellationToken)
+        {
+            await _dbContext.GoldPrices.ExecuteDeleteAsync(cancellationToken);
+
+            return NoContent();
         }
     }
 }

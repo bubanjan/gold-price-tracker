@@ -26,3 +26,16 @@ export const getGoldPriceHistory = async (
 
     return response.json();
 };
+
+export const deleteGoldPriceHistory = async (): Promise<void> => {
+    const response = await fetch(
+        'https://localhost:7111/api/goldprice/history',
+        {
+            method: 'DELETE',
+        }
+    );
+
+    if (!response.ok) {
+        throw new Error('Failed to delete gold price history');
+    }
+};
