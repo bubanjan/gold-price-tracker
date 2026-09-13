@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { Link } from 'react-router';
 import {
     Button,
     Container,
@@ -12,6 +13,7 @@ import {
     useQuery,
     useQueryClient
 } from '@tanstack/react-query';
+
 import {
     createPriceAlert,
     deletePriceAlert,
@@ -19,14 +21,14 @@ import {
     updatePriceAlert
 } from '../api/priceAlertsApi';
 
-import { Link } from 'react-router';
-
+import type { PriceAlert } from '../types/PriceAlert';
 
 function AlertsPage() {
     const queryClient = useQueryClient();
 
     const [targetPrice, setTargetPrice] = useState('');
     const [condition, setCondition] = useState('Above');
+    const [editingId, setEditingId] = useState<number | null>(null);
 
     const {
         data: alerts,
@@ -62,10 +64,15 @@ function AlertsPage() {
 
     const updateMutation = useMutation({
         mutationFn: updatePriceAlert,
+
         onSuccess: () => {
             queryClient.invalidateQueries({
                 queryKey: ['priceAlerts']
             });
+
+            setEditingId(null);
+            setTargetPrice('');
+            setCondition('Above');
         },
     });
 
@@ -74,6 +81,33 @@ function AlertsPage() {
             targetPrice: Number(targetPrice),
             condition,
         });
+    };
+
+    const handleEdit = (alert: PriceAlert) => {
+        setEditingId(alert.id);
+        setTargetPrice(alert.targetPrice.toString());
+        setCondition(alert.condition);
+    };
+
+    const handleUpdate = () => {
+        if (editingId === null) {
+            return;
+        }
+
+        updateMutation.mutate({
+            id: editingId,
+            request: {
+                targetPrice: Number(targetPrice),
+                condition,
+                isActive: true,
+            },
+        });
+    };
+
+    const handleCancelEdit = () => {
+        setEditingId(null);
+        setTargetPrice('');
+        setCondition('Above');
     };
 
     if (isLoading) {
@@ -129,13 +163,29 @@ function AlertsPage() {
 
                 <Button
                     variant="contained"
-                    onClick={handleCreate}
-                    disabled={createMutation.isPending}
+                    onClick={
+                        editingId === null
+                            ? handleCreate
+                            : handleUpdate
+                    }
+                    disabled={
+                        createMutation.isPending ||
+                        updateMutation.isPending
+                    }
                 >
-                    {createMutation.isPending
-                        ? 'Creating...'
-                        : 'Create Alert'}
+                    {editingId === null
+                        ? 'Create Alert'
+                        : 'Save Changes'}
                 </Button>
+
+                {editingId !== null && (
+                    <Button
+                        variant="text"
+                        onClick={handleCancelEdit}
+                    >
+                        Cancel Edit
+                    </Button>
+                )}
             </Stack>
 
             <Stack spacing={1}>
@@ -144,7 +194,10 @@ function AlertsPage() {
                         key={alert.id}
                         direction="row"
                         spacing={2}
-                        sx={{ alignItems: 'center' }}
+                        sx={{
+                            alignItems: 'center',
+                            justifyContent: 'space-between'
+                        }}
                     >
                         <Typography>
                             {alert.condition} ${alert.targetPrice}
@@ -152,12 +205,23 @@ function AlertsPage() {
                             {alert.isActive ? 'Active' : 'Inactive'}
                         </Typography>
 
-                        <Button
-                            color="error"
-                            onClick={() => deleteMutation.mutate(alert.id)}
-                        >
-                            Delete
-                        </Button>
+                        <Stack direction="row" spacing={1}>
+                            <Button
+                                onClick={() => handleEdit(alert)}
+                            >
+                                Edit
+                            </Button>
+
+                            <Button
+                                color="error"
+                                onClick={() =>
+                                    deleteMutation.mutate(alert.id)
+                                }
+                                disabled={deleteMutation.isPending}
+                            >
+                                Delete
+                            </Button>
+                        </Stack>
                     </Stack>
                 ))}
             </Stack>
