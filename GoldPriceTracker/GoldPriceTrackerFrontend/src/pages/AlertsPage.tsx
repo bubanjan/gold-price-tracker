@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Link } from 'react-router';
 import {
     Button,
+    Chip,
     Container,
     MenuItem,
     Stack,
@@ -37,6 +38,7 @@ function AlertsPage() {
     } = useQuery({
         queryKey: ['priceAlerts'],
         queryFn: getPriceAlerts,
+        refetchInterval: 5000,
     });
 
     const createMutation = useMutation({
@@ -188,24 +190,65 @@ function AlertsPage() {
                 )}
             </Stack>
 
-            <Stack spacing={1}>
+            <Stack spacing={2}>
                 {alerts?.map((alert) => (
                     <Stack
                         key={alert.id}
-                        direction="row"
-                        spacing={2}
+                        spacing={1}
                         sx={{
-                            alignItems: 'center',
-                            justifyContent: 'space-between'
+                            border: '1px solid',
+                            borderColor: 'divider',
+                            borderRadius: 2,
+                            p: 2,
                         }}
                     >
-                        <Typography>
-                            {alert.condition} ${alert.targetPrice}
-                            {' - '}
-                            {alert.isActive ? 'Active' : 'Inactive'}
+                        <Stack
+                            direction="row"
+                            spacing={2}
+                            sx={{
+                                alignItems: 'center',
+                                justifyContent: 'space-between'
+                            }}
+                        >
+                            <Typography variant="h6">
+                                {alert.condition} ${alert.targetPrice}
+                            </Typography>
+
+                            <Chip
+                                label={
+                                    alert.isTriggered
+                                        ? 'Triggered'
+                                        : alert.isActive
+                                            ? 'Active'
+                                            : 'Inactive'
+                                }
+                                color={
+                                    alert.isTriggered
+                                        ? 'warning'
+                                        : alert.isActive
+                                            ? 'success'
+                                            : 'default'
+                                }
+                                size="small"
+                            />
+                        </Stack>
+
+                        <Typography variant="body2">
+                            Created:{' '}
+                            {new Date(alert.createdAt).toLocaleString()}
                         </Typography>
 
-                        <Stack direction="row" spacing={1}>
+                        {alert.triggeredAt && (
+                            <Typography variant="body2">
+                                Triggered at:{' '}
+                                {new Date(alert.triggeredAt).toLocaleString()}
+                            </Typography>
+                        )}
+
+                        <Stack
+                            direction="row"
+                            spacing={1}
+                        >
                             <Button
                                 onClick={() => handleEdit(alert)}
                             >
