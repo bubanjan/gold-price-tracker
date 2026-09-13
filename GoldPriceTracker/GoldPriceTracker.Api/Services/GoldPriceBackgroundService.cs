@@ -1,5 +1,6 @@
 ﻿using GoldPriceTracker.Api.Data;
 using GoldPriceTracker.Api.Entities;
+using Microsoft.EntityFrameworkCore;
 
 namespace GoldPriceTracker.Api.Services
 {
@@ -46,6 +47,25 @@ namespace GoldPriceTracker.Api.Services
                         UpdatedAt = goldPrice.UpdatedAt,
                         FetchedAt = DateTime.UtcNow
                     };
+
+                    var priceAlerts = await dbContext.PriceAlerts
+                        .Where(x => x.IsActive && !x.IsTriggered)
+                        .ToListAsync(stoppingToken);
+
+                    foreach (var pa in priceAlerts)
+                    {
+                        if (pa.Condition == "Above" && entity.Price > pa.TargetPrice)
+                        {
+                            pa.IsTriggered = true;
+                            pa.TriggeredAt = DateTime.UtcNow;
+                        }
+
+                        if (pa.Condition == "Below" && entity.Price < pa.TargetPrice)
+                        {
+                            pa.IsTriggered = true;
+                            pa.TriggeredAt = DateTime.UtcNow;
+                        }
+                    }
 
                     dbContext.GoldPrices.Add(entity);
 
