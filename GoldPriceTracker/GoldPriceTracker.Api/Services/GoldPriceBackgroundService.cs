@@ -22,7 +22,7 @@ namespace GoldPriceTracker.Api.Services
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
-            using var timer = new PeriodicTimer(TimeSpan.FromSeconds(5));
+            using var timer = new PeriodicTimer(TimeSpan.FromSeconds(60));
 
             while (await timer.WaitForNextTickAsync(stoppingToken))
             {

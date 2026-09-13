@@ -23,8 +23,8 @@ function HomePage() {
     } = useQuery({
         queryKey: ['goldPrice'],
         queryFn: getGoldPrice,
-        staleTime: 4000,
-        refetchInterval: 5000,
+        staleTime: 40000,
+        refetchInterval: 60000,
     });
 
     if (isLoading) {
