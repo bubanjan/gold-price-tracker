@@ -7,6 +7,7 @@ import {
     CardContent,
     CircularProgress,
     Container,
+    Stack,
     Typography
 } from '@mui/material';
 import { getGoldPrice } from '../api/goldPriceApi';
@@ -75,14 +76,27 @@ function HomePage() {
                 </CardContent>
             </Card>
 
-            <Button
-                component={Link}
-                to="/history"
-                variant="contained"
+            <Stack
+                direction="row"
+                spacing={2}
                 sx={{ mt: 2 }}
             >
-                View History
-            </Button>
+                <Button
+                    component={Link}
+                    to="/history"
+                    variant="contained"
+                >
+                    View History
+                </Button>
+
+                <Button
+                    component={Link}
+                    to="/alerts"
+                    variant="outlined"
+                >
+                    Price Alerts
+                </Button>
+            </Stack>
         </Container>
     );
 }
