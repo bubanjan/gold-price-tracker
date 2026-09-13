@@ -67,9 +67,24 @@ namespace GoldPriceTracker.Api.Services
                         }
                     }
 
-                    dbContext.GoldPrices.Add(entity);
+                    var lastFetchedPrice = await dbContext.GoldPrices
+                        .OrderByDescending(x => x.FetchedAt)
+                        .FirstOrDefaultAsync(stoppingToken);
+
+                    var priceWasSaved = false;
+
+                    if (lastFetchedPrice is null || entity.Price != lastFetchedPrice.Price)
+                    {
+                        dbContext.GoldPrices.Add(entity);
+                        priceWasSaved = true;
+                    }
 
                     await dbContext.SaveChangesAsync(stoppingToken);
+
+                    if (priceWasSaved)
+                    {
+                        Console.WriteLine($"Saved gold price with ID: {entity.Id}");
+                    }
 
                     Console.WriteLine($"Saved gold price with ID: {entity.Id}");
 

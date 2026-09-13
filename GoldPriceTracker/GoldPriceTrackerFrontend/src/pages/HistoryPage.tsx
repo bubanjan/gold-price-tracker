@@ -68,7 +68,7 @@ function HistoryPage() {
             {data?.items.map((item) => (
                 <Typography key={item.id}>
                     {item.price} {item.currency} -{' '}
-                    {new Date(item.fetchedAt).toLocaleTimeString()}
+                    {new Date(item.fetchedAt).toLocaleString()}
                 </Typography>
             ))}
 
