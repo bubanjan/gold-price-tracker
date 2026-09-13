@@ -1,9 +1,7 @@
 import { useState } from 'react';
-import { Link } from 'react-router';
 import {
     Button,
     Chip,
-    Container,
     MenuItem,
     Stack,
     TextField,
@@ -24,7 +22,7 @@ import {
 
 import type { PriceAlert } from '../types/PriceAlert';
 
-function AlertsPage() {
+function PriceAlerts() {
     const queryClient = useQueryClient();
 
     const [targetPrice, setTargetPrice] = useState('');
@@ -43,7 +41,6 @@ function AlertsPage() {
 
     const createMutation = useMutation({
         mutationFn: createPriceAlert,
-
         onSuccess: () => {
             queryClient.invalidateQueries({
                 queryKey: ['priceAlerts']
@@ -56,7 +53,6 @@ function AlertsPage() {
 
     const deleteMutation = useMutation({
         mutationFn: deletePriceAlert,
-
         onSuccess: () => {
             queryClient.invalidateQueries({
                 queryKey: ['priceAlerts']
@@ -66,7 +62,6 @@ function AlertsPage() {
 
     const updateMutation = useMutation({
         mutationFn: updatePriceAlert,
-
         onSuccess: () => {
             queryClient.invalidateQueries({
                 queryKey: ['priceAlerts']
@@ -113,39 +108,24 @@ function AlertsPage() {
     };
 
     if (isLoading) {
-        return (
-            <Container sx={{ mt: 5 }}>
-                <Typography>Loading alerts...</Typography>
-            </Container>
-        );
+        return <Typography>Loading alerts...</Typography>;
     }
 
     if (isError) {
         return (
-            <Container sx={{ mt: 5 }}>
-                <Typography color="error">
-                    Failed to load alerts
-                </Typography>
-            </Container>
+            <Typography color="error">
+                Failed to load alerts
+            </Typography>
         );
     }
 
     return (
-        <Container maxWidth="sm" sx={{ mt: 5 }}>
-            <Typography variant="h4" gutterBottom>
+        <Stack spacing={3}>
+            <Typography variant="h5">
                 Price Alerts
             </Typography>
 
-            <Button
-                component={Link}
-                to="/"
-                variant="outlined"
-                sx={{ mb: 2 }}
-            >
-                Back to Current Price
-            </Button>
-
-            <Stack spacing={2} sx={{ mb: 4 }}>
+            <Stack spacing={2}>
                 <TextField
                     label="Target price"
                     type="number"
@@ -181,10 +161,7 @@ function AlertsPage() {
                 </Button>
 
                 {editingId !== null && (
-                    <Button
-                        variant="text"
-                        onClick={handleCancelEdit}
-                    >
+                    <Button onClick={handleCancelEdit}>
                         Cancel Edit
                     </Button>
                 )}
@@ -245,13 +222,8 @@ function AlertsPage() {
                             </Typography>
                         )}
 
-                        <Stack
-                            direction="row"
-                            spacing={1}
-                        >
-                            <Button
-                                onClick={() => handleEdit(alert)}
-                            >
+                        <Stack direction="row" spacing={1}>
+                            <Button onClick={() => handleEdit(alert)}>
                                 Edit
                             </Button>
 
@@ -268,8 +240,8 @@ function AlertsPage() {
                     </Stack>
                 ))}
             </Stack>
-        </Container>
+        </Stack>
     );
 }
 
-export default AlertsPage;
+export default PriceAlerts;

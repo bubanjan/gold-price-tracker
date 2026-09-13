@@ -80,6 +80,9 @@ namespace GoldPriceTracker.Api.Controllers
             alert.Condition = request.Condition;
             alert.IsActive = request.IsActive;
 
+            alert.IsTriggered = false;
+            alert.TriggeredAt = null;
+
             await _dbContext.SaveChangesAsync();
 
             return NoContent();

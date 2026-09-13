@@ -11,6 +11,7 @@ import {
     Typography
 } from '@mui/material';
 import { getGoldPrice } from '../api/goldPriceApi';
+import PriceAlerts from '../components/PriceAlerts';
 
 function HomePage() {
     const {
@@ -76,6 +77,10 @@ function HomePage() {
                 </CardContent>
             </Card>
 
+            <Stack sx={{ mt: 4 }}>
+                <PriceAlerts />
+            </Stack>
+
             <Stack
                 direction="row"
                 spacing={2}
@@ -89,13 +94,6 @@ function HomePage() {
                     View History
                 </Button>
 
-                <Button
-                    component={Link}
-                    to="/alerts"
-                    variant="outlined"
-                >
-                    Price Alerts
-                </Button>
             </Stack>
         </Container>
     );
