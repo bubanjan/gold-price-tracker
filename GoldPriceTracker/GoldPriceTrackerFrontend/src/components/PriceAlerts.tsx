@@ -8,23 +8,16 @@ import {
     TextField,
     Typography
 } from '@mui/material';
-import {
-    useMutation,
-    useQuery,
-    useQueryClient
-} from '@tanstack/react-query';
-
-import {
-    createPriceAlert,
-    deletePriceAlert,
-    getPriceAlerts,
-    updatePriceAlert
-} from '../api/priceAlertsApi';
 
 import type { AlertCondition, PriceAlert } from '../types/PriceAlert';
+import {
+    useCreatePriceAlert,
+    useDeletePriceAlert,
+    usePriceAlerts,
+    useUpdatePriceAlert
+} from '../hooks/usePriceAlerts';
 
 function PriceAlerts() {
-    const queryClient = useQueryClient();
 
     const [targetPrice, setTargetPrice] = useState('');
     const [condition, setCondition] = useState<AlertCondition>('Above');
@@ -35,61 +28,37 @@ function PriceAlerts() {
         data: alerts,
         isLoading,
         isError
-    } = useQuery({
-        queryKey: ['priceAlerts'],
-        queryFn: getPriceAlerts,
-        refetchInterval: 5000,
-    });
+    } = usePriceAlerts();
 
-    const createMutation = useMutation({
-        mutationFn: createPriceAlert,
-        onSuccess: () => {
-            queryClient.invalidateQueries({
-                queryKey: ['priceAlerts']
-            });
+    const createMutation = useCreatePriceAlert();
 
-            setTargetPrice('');
-            setCondition('Above');
-        },
-    });
+    const deleteMutation = useDeletePriceAlert();
 
-    const deleteMutation = useMutation({
-        mutationFn: deletePriceAlert,
-        onSuccess: () => {
-            queryClient.invalidateQueries({
-                queryKey: ['priceAlerts']
-            });
-        },
-    });
-
-    const updateMutation = useMutation({
-        mutationFn: updatePriceAlert,
-        onSuccess: () => {
-            queryClient.invalidateQueries({
-                queryKey: ['priceAlerts']
-            });
-
-            setEditingId(null);
-            setTargetPrice('');
-            setCondition('Above');
-        },
-    });
+    const updateMutation = useUpdatePriceAlert();
 
     const handleCreate = () => {
 
         const price = Number(targetPrice);
 
         if (!targetPrice || price <= 0) {
-            setTargetPriceError('Target price must be greater then 0');
+            setTargetPriceError('Target price must be greater than 0');
             return;
         }
 
         setTargetPriceError('');
 
-        createMutation.mutate({
-            targetPrice: price,
-            condition,
-        });
+        createMutation.mutate(
+            {
+                targetPrice: price,
+                condition,
+            },
+            {
+                onSuccess: () => {
+                    setTargetPrice('');
+                    setCondition('Above');
+                },
+            }
+        );
     };
 
     const handleEdit = (alert: PriceAlert) => {
@@ -113,14 +82,22 @@ function PriceAlerts() {
 
         setTargetPriceError('');
 
-        updateMutation.mutate({
-            id: editingId,
-            request: {
-                targetPrice: price,
-                condition,
-                isActive: true,
+        updateMutation.mutate(
+            {
+                id: editingId,
+                request: {
+                    targetPrice: price,
+                    condition,
+                    isActive: true,
+                },
             },
-        });
+            {
+                onSuccess: () => {
+                    setEditingId(null);
+                    setTargetPrice('');
+                    setCondition('Above');
+                },
+            });
     };
 
     const handleCancelEdit = () => {

@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Link } from 'react-router';
 import {
+    Alert,
     Button,
     CircularProgress,
     Container,
@@ -12,17 +13,8 @@ import {
     Pagination,
     Typography
 } from '@mui/material';
-import {
-    keepPreviousData,
-    useMutation,
-    useQuery,
-    useQueryClient
-} from '@tanstack/react-query';
 
-import {
-    deleteGoldPriceHistory,
-    getGoldPriceHistory
-} from '../api/goldPriceApi';
+import { useDeleteGoldPriceHistory, useGoldPriceHistory } from '../hooks/useGoldPriceHistory';
 
 function HistoryPage() {
     const [page, setPage] = useState(1);
@@ -30,30 +22,14 @@ function HistoryPage() {
 
     const pageSize = 20;
 
-    const queryClient = useQueryClient();
-
     const {
         data,
         isLoading,
         isError,
         isFetching,
-    } = useQuery({
-        queryKey: ['goldPriceHistory', page, pageSize],
-        queryFn: () => getGoldPriceHistory(page, pageSize),
-        placeholderData: keepPreviousData,
-    });
+    } = useGoldPriceHistory(page, pageSize);
 
-    const deleteHistoryMutation = useMutation({
-        mutationFn: deleteGoldPriceHistory,
-
-        onSuccess: () => {
-            queryClient.invalidateQueries({
-                queryKey: ['goldPriceHistory']
-            });
-
-            setPage(1);
-        },
-    });
+    const deleteHistoryMutation = useDeleteGoldPriceHistory();
 
     if (isLoading) {
         return (
@@ -75,6 +51,7 @@ function HistoryPage() {
 
     return (
         <Container maxWidth="sm" sx={{ mt: 5 }}>
+
             <Button
                 component={Link}
                 to="/"
@@ -117,7 +94,11 @@ function HistoryPage() {
 
             <Dialog
                 open={deleteDialogOpen}
-                onClose={() => setDeleteDialogOpen(false)}
+                onClose={() => {
+                    if (!deleteHistoryMutation.isPending) {
+                        setDeleteDialogOpen(false);
+                    }
+                }}
             >
                 <DialogTitle>
                     Clear gold price history?
@@ -128,11 +109,18 @@ function HistoryPage() {
                         This will permanently delete all saved gold price
                         history. This action cannot be undone.
                     </DialogContentText>
+                    {deleteHistoryMutation.isError && (
+                        <Alert severity="error" sx={{ mt: 2 }}>
+                            {deleteHistoryMutation.error.message}
+                        </Alert>
+                    )}
+
                 </DialogContent>
 
                 <DialogActions>
                     <Button
                         onClick={() => setDeleteDialogOpen(false)}
+                        disabled={deleteHistoryMutation.isPending}
                     >
                         Cancel
                     </Button>
@@ -140,8 +128,15 @@ function HistoryPage() {
                     <Button
                         color="error"
                         onClick={() => {
-                            deleteHistoryMutation.mutate();
-                            setDeleteDialogOpen(false);
+                            deleteHistoryMutation.mutate(
+                                undefined,
+                                {
+                                    onSuccess: () => {
+                                        setPage(1);
+                                        setDeleteDialogOpen(false);
+                                    }
+                                }
+                            );
                         }}
                         disabled={deleteHistoryMutation.isPending}
                     >
@@ -151,7 +146,7 @@ function HistoryPage() {
                     </Button>
                 </DialogActions>
             </Dialog>
-        </Container>
+        </Container >
     );
 }
 

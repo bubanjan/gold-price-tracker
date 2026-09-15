@@ -1,5 +1,4 @@
 
-import { useQuery } from '@tanstack/react-query';
 import { Link } from 'react-router';
 import {
     Button,
@@ -10,8 +9,8 @@ import {
     Stack,
     Typography
 } from '@mui/material';
-import { getGoldPrice } from '../api/goldPriceApi';
 import PriceAlerts from '../components/PriceAlerts';
+import { useGoldPrice } from '../hooks/useGoldPrice';
 
 function HomePage() {
     const {
@@ -20,12 +19,7 @@ function HomePage() {
         isError,
         error,
         dataUpdatedAt
-    } = useQuery({
-        queryKey: ['goldPrice'],
-        queryFn: getGoldPrice,
-        staleTime: 40000,
-        refetchInterval: 60000,
-    });
+    } = useGoldPrice();
 
     if (isLoading) {
         return (
