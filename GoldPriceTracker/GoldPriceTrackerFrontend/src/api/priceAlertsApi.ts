@@ -6,11 +6,33 @@ import type {
 
 const url = 'https://localhost:7111/api/pricealerts';
 
+type ApiError = {
+    title?: string;
+    errors?: Record<string, string[]>;
+};
+
+const getErrorMessage = async (response: Response): Promise<string> => {
+    try {
+        const data: ApiError = await response.json();
+
+        if (data.errors) {
+            const messages = Object.values(data.errors).flat();
+
+            return messages.join(', ');
+        }
+
+    } catch { }
+
+    return 'Something went wrong';
+};
+
+
 export const getPriceAlerts = async (): Promise<PriceAlert[]> => {
     const response = await fetch(url);
 
     if (!response.ok) {
-        throw new Error('Failed to fetch price alerts');
+        const message = await getErrorMessage(response);
+        throw new Error(message);
     }
 
     return response.json();
@@ -28,19 +50,23 @@ export const createPriceAlert = async (
     });
 
     if (!response.ok) {
-        throw new Error('Failed to create price alert');
+        const message = await getErrorMessage(response);
+        throw new Error(message);
     }
 
     return response.json();
 };
 
-export const deletePriceAlert = async (id: number): Promise<void> => {
+export const deletePriceAlert = async (
+    id: number
+): Promise<void> => {
     const response = await fetch(`${url}/${id}`, {
         method: 'DELETE',
     });
 
     if (!response.ok) {
-        throw new Error('Failed to delete price alert');
+        const message = await getErrorMessage(response);
+        throw new Error(message);
     }
 };
 
@@ -62,6 +88,7 @@ export const updatePriceAlert = async ({
     });
 
     if (!response.ok) {
-        throw new Error('Failed to update price alert');
+        const message = await getErrorMessage(response);
+        throw new Error(message);
     }
 };
