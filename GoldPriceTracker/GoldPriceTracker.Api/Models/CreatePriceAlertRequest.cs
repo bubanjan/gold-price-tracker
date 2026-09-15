@@ -1,8 +1,10 @@
-﻿namespace GoldPriceTracker.Api.Models
+﻿using GoldPriceTracker.Api.Entities;
+
+namespace GoldPriceTracker.Api.Models
 {
     public class CreatePriceAlertRequest
     {
         public decimal TargetPrice { get; set; }
-        public string Condition { get; set; } = string.Empty;
+        public AlertCondition Condition { get; set; }
     }
 }

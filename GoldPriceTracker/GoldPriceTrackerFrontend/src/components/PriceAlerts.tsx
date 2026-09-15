@@ -20,13 +20,13 @@ import {
     updatePriceAlert
 } from '../api/priceAlertsApi';
 
-import type { PriceAlert } from '../types/PriceAlert';
+import type { AlertCondition, PriceAlert } from '../types/PriceAlert';
 
 function PriceAlerts() {
     const queryClient = useQueryClient();
 
     const [targetPrice, setTargetPrice] = useState('');
-    const [condition, setCondition] = useState('Above');
+    const [condition, setCondition] = useState<AlertCondition>('Above');
     const [editingId, setEditingId] = useState<number | null>(null);
 
     const {
@@ -137,7 +137,7 @@ function PriceAlerts() {
                     select
                     label="Condition"
                     value={condition}
-                    onChange={(e) => setCondition(e.target.value)}
+                    onChange={(e) => setCondition(e.target.value as AlertCondition)}
                 >
                     <MenuItem value="Above">Above</MenuItem>
                     <MenuItem value="Below">Below</MenuItem>

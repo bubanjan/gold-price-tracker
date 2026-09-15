@@ -1,7 +1,11 @@
+
+
+export type AlertCondition = 'Above' | 'Below';
+
 export type PriceAlert = {
     id: number;
     targetPrice: number;
-    condition: string;
+    condition: AlertCondition;
     isActive: boolean;
     isTriggered: boolean;
     createdAt: string;
@@ -10,11 +14,11 @@ export type PriceAlert = {
 
 export type CreatePriceAlertRequest = {
     targetPrice: number;
-    condition: string;
+    condition: AlertCondition;
 };
 
 export type UpdatePriceAlertRequest = {
     targetPrice: number;
-    condition: string;
+    condition: AlertCondition;
     isActive: boolean;
 };

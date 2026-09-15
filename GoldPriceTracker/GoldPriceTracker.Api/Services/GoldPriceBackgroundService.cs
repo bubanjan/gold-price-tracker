@@ -54,13 +54,13 @@ namespace GoldPriceTracker.Api.Services
 
                     foreach (var pa in priceAlerts)
                     {
-                        if (pa.Condition == "Above" && entity.Price > pa.TargetPrice)
+                        if (pa.Condition == AlertCondition.Above && entity.Price > pa.TargetPrice)
                         {
                             pa.IsTriggered = true;
                             pa.TriggeredAt = DateTime.UtcNow;
                         }
 
-                        if (pa.Condition == "Below" && entity.Price < pa.TargetPrice)
+                        if (pa.Condition == AlertCondition.Below && entity.Price < pa.TargetPrice)
                         {
                             pa.IsTriggered = true;
                             pa.TriggeredAt = DateTime.UtcNow;

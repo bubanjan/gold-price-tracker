@@ -6,7 +6,7 @@
 
         public decimal TargetPrice { get; set; }
 
-        public string Condition { get; set; } = string.Empty;
+        public AlertCondition Condition { get; set; }
 
         public bool IsActive { get; set; } = true;
 
