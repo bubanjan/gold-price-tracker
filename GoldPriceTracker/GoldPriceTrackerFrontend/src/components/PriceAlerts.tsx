@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import {
+    Alert,
     Button,
     Chip,
     MenuItem,
@@ -28,6 +29,7 @@ function PriceAlerts() {
     const [targetPrice, setTargetPrice] = useState('');
     const [condition, setCondition] = useState<AlertCondition>('Above');
     const [editingId, setEditingId] = useState<number | null>(null);
+    const [targetPriceError, setTargetPriceError] = useState('');
 
     const {
         data: alerts,
@@ -74,8 +76,18 @@ function PriceAlerts() {
     });
 
     const handleCreate = () => {
+
+        const price = Number(targetPrice);
+
+        if (!targetPrice || price <= 0) {
+            setTargetPriceError('Target price must be greater then 0');
+            return;
+        }
+
+        setTargetPriceError('');
+
         createMutation.mutate({
-            targetPrice: Number(targetPrice),
+            targetPrice: price,
             condition,
         });
     };
@@ -84,6 +96,7 @@ function PriceAlerts() {
         setEditingId(alert.id);
         setTargetPrice(alert.targetPrice.toString());
         setCondition(alert.condition);
+        setTargetPriceError('');
     };
 
     const handleUpdate = () => {
@@ -91,10 +104,19 @@ function PriceAlerts() {
             return;
         }
 
+        const price = Number(targetPrice);
+
+        if (!targetPrice || price <= 0) {
+            setTargetPriceError('Target price must be greater than 0');
+            return;
+        }
+
+        setTargetPriceError('');
+
         updateMutation.mutate({
             id: editingId,
             request: {
-                targetPrice: Number(targetPrice),
+                targetPrice: price,
                 condition,
                 isActive: true,
             },
@@ -105,6 +127,7 @@ function PriceAlerts() {
         setEditingId(null);
         setTargetPrice('');
         setCondition('Above');
+        setTargetPriceError('');
     };
 
     if (isLoading) {
@@ -119,18 +142,49 @@ function PriceAlerts() {
         );
     }
 
+
     return (
         <Stack spacing={3}>
             <Typography variant="h5">
                 Price Alerts
             </Typography>
 
+            {
+                createMutation.isError && (
+                    <Alert severity="error">
+                        {createMutation.error.message}
+                    </Alert>
+                )
+            }
+
+            {
+                updateMutation.isError && (
+                    <Alert severity="error">
+                        {updateMutation.error.message}
+                    </Alert>
+                )
+            }
+
+            {
+                deleteMutation.isError && (
+                    <Alert severity="error">
+                        {deleteMutation.error.message}
+                    </Alert>
+                )
+            }
+
+
             <Stack spacing={2}>
                 <TextField
                     label="Target price"
                     type="number"
                     value={targetPrice}
-                    onChange={(e) => setTargetPrice(e.target.value)}
+                    onChange={(e) => {
+                        setTargetPrice(e.target.value);
+                        setTargetPriceError('');
+                    }}
+                    error={!!targetPriceError}
+                    helperText={targetPriceError}
                 />
 
                 <TextField
