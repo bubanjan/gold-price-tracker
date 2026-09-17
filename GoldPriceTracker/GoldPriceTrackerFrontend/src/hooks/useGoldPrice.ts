@@ -9,3 +9,4 @@ export const useGoldPrice = () => {
         refetchInterval: 60000,
     });
 };
+

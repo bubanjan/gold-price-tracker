@@ -65,5 +65,23 @@ namespace GoldPriceTracker.Api.Controllers
 
             return NoContent();
         }
+
+        [HttpGet("chart")]
+        public async Task<IActionResult> GetChart(int hours, CancellationToken cancellationToken)
+        {
+            if(hours <1 || hours > 168)
+            {
+                return BadRequest("Housr must be between 1 and 168.");
+            }
+
+            var from = DateTime.UtcNow.AddHours(-hours);
+
+            var history = await _dbContext.GoldPrices
+                .Where(x => x.FetchedAt >= from)
+                .OrderBy(x => x.FetchedAt)
+                .ToListAsync(cancellationToken);
+
+            return Ok(history);
+        }
     }
 }

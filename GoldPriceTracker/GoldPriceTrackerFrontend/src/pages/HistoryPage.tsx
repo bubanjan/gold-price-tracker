@@ -15,10 +15,13 @@ import {
 } from '@mui/material';
 
 import { useDeleteGoldPriceHistory, useGoldPriceHistory } from '../hooks/useGoldPriceHistory';
+import { useGoldPriceChart } from '../hooks/useGoldPriceChart';
+import GoldPriceChart from '../components/GoldPriceChart';
 
 function HistoryPage() {
     const [page, setPage] = useState(1);
     const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+    const [chartHours, setChartHours] = useState(24);
 
     const pageSize = 20;
 
@@ -28,6 +31,12 @@ function HistoryPage() {
         isError,
         isFetching,
     } = useGoldPriceHistory(page, pageSize);
+
+    const {
+        data: chartData,
+        isLoading: isChartLoading,
+        isError: isChartError,
+    } = useGoldPriceChart(chartHours);
 
     const deleteHistoryMutation = useDeleteGoldPriceHistory();
 
@@ -146,6 +155,38 @@ function HistoryPage() {
                     </Button>
                 </DialogActions>
             </Dialog>
+
+
+            <Button onClick={() => setChartHours(1)}>
+                1H
+            </Button>
+
+            <Button onClick={() => setChartHours(6)}>
+                6H
+            </Button>
+
+            <Button onClick={() => setChartHours(24)}>
+                24H
+            </Button>
+
+            <Button onClick={() => setChartHours(168)}>
+                7D
+            </Button>
+
+            {isChartLoading && (
+                <CircularProgress />
+            )}
+
+            {isChartError && (
+                <Alert severity="error">
+                    Failed to load chart
+                </Alert>
+            )}
+
+            {chartData && (
+                <GoldPriceChart data={chartData} />
+            )}
+
         </Container >
     );
 }
