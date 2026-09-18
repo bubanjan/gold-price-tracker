@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Link } from 'react-router';
 import {
     Alert,
+    Box,
     Button,
     CircularProgress,
     Container,
@@ -59,135 +60,149 @@ function HistoryPage() {
     }
 
     return (
-        <Container maxWidth="sm" sx={{ mt: 5 }}>
+        <Container maxWidth="lg" sx={{ mt: 2 }}>
+            <Box sx={{
+                display: 'flex',
+                flexDirection: {
+                    xs: 'column',
+                    md: 'row',
+                },
+                gap: 3
+            }}>
 
-            <Button
-                component={Link}
-                to="/"
-                variant="outlined"
-                sx={{ mb: 2 }}
-            >
-                Back to Current Price
-            </Button>
+                <Box sx={{ flex: 1, mt: 2, minWidth: 0 }}>
+                    <Button
+                        component={Link}
+                        to="/"
+                        variant="outlined"
+                        sx={{ mb: 2 }}
+                    >
+                        Back to Current Price
+                    </Button>
 
-            <Button
-                sx={{ mb: 2, ml: 1 }}
-                color="error"
-                variant="outlined"
-                onClick={() => setDeleteDialogOpen(true)}
-            >
-                Clear History
-            </Button>
+                    <Button
+                        sx={{ mb: 2, ml: 1 }}
+                        color="error"
+                        variant="outlined"
+                        onClick={() => setDeleteDialogOpen(true)}
+                    >
+                        Clear History
+                    </Button>
 
-            <Typography variant="h4" gutterBottom>
-                Gold Price History
-            </Typography>
+                    <Typography variant="h4" gutterBottom>
+                        Gold Price History
+                    </Typography>
 
-            {isFetching && (
-                <CircularProgress size={20} />
-            )}
+                    {isFetching && (
+                        <CircularProgress size={20} />
+                    )}
 
-            {data?.items.map((item) => (
-                <Typography key={item.id}>
-                    {item.price} {item.currency} -{' '}
-                    {new Date(item.fetchedAt).toLocaleString()}
-                </Typography>
-            ))}
+                    {data?.items.map((item) => (
+                        <Typography key={item.id}>
+                            {item.price} {item.currency} -{' '}
+                            {new Date(item.fetchedAt).toLocaleString()}
+                        </Typography>
+                    ))}
 
-            <Pagination
-                count={data?.totalPages ?? 1}
-                page={page}
-                onChange={(_, value) => setPage(value)}
-                sx={{ mt: 3 }}
-            />
+                    <Pagination
+                        count={data?.totalPages ?? 1}
+                        page={page}
+                        onChange={(_, value) => setPage(value)}
+                        sx={{ mt: 3 }}
+                    />
 
-            <Dialog
-                open={deleteDialogOpen}
-                onClose={() => {
-                    if (!deleteHistoryMutation.isPending) {
-                        setDeleteDialogOpen(false);
-                    }
-                }}
-            >
-                <DialogTitle>
-                    Clear gold price history?
-                </DialogTitle>
+                    <Dialog
+                        open={deleteDialogOpen}
+                        onClose={() => {
+                            if (!deleteHistoryMutation.isPending) {
+                                setDeleteDialogOpen(false);
+                            }
+                        }}
+                    >
+                        <DialogTitle>
+                            Clear gold price history?
+                        </DialogTitle>
 
-                <DialogContent>
-                    <DialogContentText>
-                        This will permanently delete all saved gold price
-                        history. This action cannot be undone.
-                    </DialogContentText>
-                    {deleteHistoryMutation.isError && (
-                        <Alert severity="error" sx={{ mt: 2 }}>
-                            {deleteHistoryMutation.error.message}
+                        <DialogContent>
+                            <DialogContentText>
+                                This will permanently delete all saved gold price
+                                history. This action cannot be undone.
+                            </DialogContentText>
+                            {deleteHistoryMutation.isError && (
+                                <Alert severity="error" sx={{ mt: 2 }}>
+                                    {deleteHistoryMutation.error.message}
+                                </Alert>
+                            )}
+
+                        </DialogContent>
+
+                        <DialogActions>
+                            <Button
+                                onClick={() => setDeleteDialogOpen(false)}
+                                disabled={deleteHistoryMutation.isPending}
+                            >
+                                Cancel
+                            </Button>
+
+                            <Button
+                                color="error"
+                                onClick={() => {
+                                    deleteHistoryMutation.mutate(
+                                        undefined,
+                                        {
+                                            onSuccess: () => {
+                                                setPage(1);
+                                                setDeleteDialogOpen(false);
+                                            }
+                                        }
+                                    );
+                                }}
+                                disabled={deleteHistoryMutation.isPending}
+                            >
+                                {deleteHistoryMutation.isPending
+                                    ? 'Deleting...'
+                                    : 'Delete'}
+                            </Button>
+                        </DialogActions>
+                    </Dialog>
+
+                </Box>
+                <Box sx={{ flex: 2, minWidth: 0 }}>
+
+                    <Button onClick={() => setChartHours(1)}>
+                        1H
+                    </Button>
+
+                    <Button onClick={() => setChartHours(6)}>
+                        6H
+                    </Button>
+
+                    <Button onClick={() => setChartHours(24)}>
+                        24H
+                    </Button>
+
+                    <Button onClick={() => setChartHours(168)}>
+                        7D
+                    </Button>
+
+                    {isChartLoading && (
+                        <CircularProgress />
+                    )}
+
+                    {isChartError && (
+                        <Alert severity="error">
+                            Failed to load chart
                         </Alert>
                     )}
 
-                </DialogContent>
+                    {chartData && (
+                        <GoldPriceChart data={chartData} hours={chartHours} />
+                    )}
 
-                <DialogActions>
-                    <Button
-                        onClick={() => setDeleteDialogOpen(false)}
-                        disabled={deleteHistoryMutation.isPending}
-                    >
-                        Cancel
-                    </Button>
+                </Box>
 
-                    <Button
-                        color="error"
-                        onClick={() => {
-                            deleteHistoryMutation.mutate(
-                                undefined,
-                                {
-                                    onSuccess: () => {
-                                        setPage(1);
-                                        setDeleteDialogOpen(false);
-                                    }
-                                }
-                            );
-                        }}
-                        disabled={deleteHistoryMutation.isPending}
-                    >
-                        {deleteHistoryMutation.isPending
-                            ? 'Deleting...'
-                            : 'Delete'}
-                    </Button>
-                </DialogActions>
-            </Dialog>
-
-
-            <Button onClick={() => setChartHours(1)}>
-                1H
-            </Button>
-
-            <Button onClick={() => setChartHours(6)}>
-                6H
-            </Button>
-
-            <Button onClick={() => setChartHours(24)}>
-                24H
-            </Button>
-
-            <Button onClick={() => setChartHours(168)}>
-                7D
-            </Button>
-
-            {isChartLoading && (
-                <CircularProgress />
-            )}
-
-            {isChartError && (
-                <Alert severity="error">
-                    Failed to load chart
-                </Alert>
-            )}
-
-            {chartData && (
-                <GoldPriceChart data={chartData} />
-            )}
-
-        </Container >
+            </Box>
+        </Container>
     );
 }
 

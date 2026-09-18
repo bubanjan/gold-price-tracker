@@ -1,6 +1,7 @@
 
 import { Link } from 'react-router';
 import {
+    Box,
     Button,
     Card,
     CardContent,
@@ -45,50 +46,67 @@ function HomePage() {
     }).format(data?.price ?? 0);
 
     return (
-        <Container maxWidth="sm" sx={{ mt: 5 }}>
-            <Card>
-                <CardContent>
-                    <Typography variant="h4" gutterBottom>
-                        Gold Price Tracker
-                    </Typography>
+        <Container maxWidth="lg" sx={{ mt: 5 }}>
 
-                    <Typography variant="h3">
-                        {formattedPrice}
-                    </Typography>
-
-                    <Typography variant="body1">
-                        {data?.currency} / oz
-                    </Typography>
-
-                    <Typography variant="body2" sx={{ mt: 2 }}>
-                        Gold API updated: {data?.updatedAtReadable}
-                    </Typography>
-
-                    <Typography variant="body2">
-                        Frontend fetched at:{' '}
-                        {new Date(dataUpdatedAt).toLocaleTimeString()}
-                    </Typography>
-                </CardContent>
-            </Card>
-
-            <Stack sx={{ mt: 4 }}>
-                <PriceAlerts />
-            </Stack>
-
-            <Stack
-                direction="row"
-                spacing={2}
-                sx={{ mt: 2 }}
+            <Box
+                sx={{
+                    display: 'flex',
+                    flexDirection: {
+                        xs: 'column',
+                        md: 'row',
+                    },
+                    gap: 3,
+                }}
             >
-                <Button
-                    component={Link}
-                    to="/history"
-                    variant="contained"
-                >
-                    View History
-                </Button>
+                <Box sx={{ flex: 1, minWidth: 0 }}>
+                    <Card>
+                        <CardContent>
+                            <Typography variant="h4" gutterBottom>
+                                Gold Price Tracker
+                            </Typography>
 
-            </Stack>
+                            <Typography variant="h3">
+                                {formattedPrice}
+                            </Typography>
+
+                            <Typography variant="body1">
+                                {data?.currency} / oz
+                            </Typography>
+
+                            <Typography variant="body2" sx={{ mt: 2 }}>
+                                Gold API updated: {data?.updatedAtReadable}
+                            </Typography>
+
+                            <Typography variant="body2">
+                                Frontend fetched at:{' '}
+                                {new Date(dataUpdatedAt).toLocaleTimeString()}
+                            </Typography>
+                        </CardContent>
+                    </Card>
+
+
+
+                    <Stack
+                        direction="row"
+                        spacing={2}
+                        sx={{ mt: 2 }}
+                    >
+                        <Button
+                            component={Link}
+                            to="/history"
+                            variant="contained"
+                        >
+                            View History
+                        </Button>
+
+                    </Stack>
+                </Box>
+
+                <Box sx={{ flex: 2, minWidth: 0 }}>
+                    <PriceAlerts />
+                </Box>
+            </Box>
+
         </Container>
     );
 }

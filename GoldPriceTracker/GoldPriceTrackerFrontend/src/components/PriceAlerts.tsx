@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import {
     Alert,
+    Box,
     Button,
     Chip,
     MenuItem,
@@ -198,7 +199,14 @@ function PriceAlerts() {
                 )}
             </Stack>
 
-            <Stack spacing={2}>
+            <Box sx={{
+                maxHeight: 350,
+                overflowY: 'auto',
+                border: 1,
+                borderColor: 'divider',
+                borderRadius: 1,
+                p: 2,
+            }}>
                 {alerts?.map((alert) => (
                     <Stack
                         key={alert.id}
@@ -270,7 +278,7 @@ function PriceAlerts() {
                         </Stack>
                     </Stack>
                 ))}
-            </Stack>
+            </Box>
         </Stack>
     );
 }
