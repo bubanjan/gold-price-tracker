@@ -1,5 +1,7 @@
 using GoldPriceTracker.Api.Data;
+using GoldPriceTracker.Api.Entities;
 using GoldPriceTracker.Api.Services;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using System.Text.Json.Serialization;
 
@@ -20,6 +22,16 @@ builder.Services.AddOpenApi();
 builder.Services.AddHttpClient<GoldApiClient>();
 builder.Services.AddHostedService<GoldPriceBackgroundService>();
 builder.Services.AddSingleton<GoldPriceStore>();
+builder.Services.AddScoped<IPasswordHasher<User>, PasswordHasher<User>>();
+
+builder.Services
+    .AddAuthentication("Cookies")
+    .AddCookie("Cookies", options =>
+    {
+        options.Cookie.HttpOnly = true;
+        options.Cookie.SameSite = SameSiteMode.Lax;
+        options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
+    });
 
 builder.Services.AddCors(options =>
 {
@@ -28,7 +40,8 @@ builder.Services.AddCors(options =>
         policy
             .WithOrigins("http://localhost:5173")
             .AllowAnyHeader()
-            .AllowAnyMethod();
+            .AllowAnyMethod()
+            .AllowCredentials();
     });
 });
 
@@ -52,6 +65,8 @@ if (app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 
 app.UseCors("AllowFrontend");
+
+app.UseAuthentication();
 
 app.UseAuthorization();
 

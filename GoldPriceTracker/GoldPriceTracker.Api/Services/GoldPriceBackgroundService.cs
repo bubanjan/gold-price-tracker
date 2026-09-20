@@ -9,26 +9,39 @@ namespace GoldPriceTracker.Api.Services
         private readonly GoldApiClient _goldApiClient;
         private readonly GoldPriceStore _goldPriceStore;
         private readonly IServiceScopeFactory _scopeFactory;
+        private readonly ILogger<GoldPriceBackgroundService> _logger;
 
         public GoldPriceBackgroundService(
             GoldApiClient goldApiClient,
             GoldPriceStore goldPriceStore,
-            IServiceScopeFactory scopeFactory)
+            IServiceScopeFactory scopeFactory,
+            ILogger<GoldPriceBackgroundService> logger)
         {
             _goldApiClient = goldApiClient;
             _goldPriceStore = goldPriceStore;
             _scopeFactory = scopeFactory;
+            _logger = logger;
         }
 
-        protected override async Task ExecuteAsync(CancellationToken stoppingToken)
+        protected override async Task ExecuteAsync(
+            CancellationToken stoppingToken)
         {
-            await FetchAndProcessGoldPrice(stoppingToken);
+            await TryFetchAndProcessGoldPrice(stoppingToken);
 
             using var timer = new PeriodicTimer(TimeSpan.FromSeconds(60));
 
-            while (await timer.WaitForNextTickAsync(stoppingToken))
+            try
             {
-                await FetchAndProcessGoldPrice(stoppingToken);
+                while (await timer.WaitForNextTickAsync(stoppingToken))
+                {
+                    await TryFetchAndProcessGoldPrice(stoppingToken);
+                }
+            }
+            catch (OperationCanceledException)
+                when (stoppingToken.IsCancellationRequested)
+            {
+                _logger.LogInformation(
+                    "Gold price background service stopped.");
             }
         }
 
@@ -40,6 +53,8 @@ namespace GoldPriceTracker.Api.Services
 
             if (goldPrice is null)
             {
+                _logger.LogWarning("Gold API returned no price data.");
+
                 return;
             }
 
@@ -100,13 +115,36 @@ namespace GoldPriceTracker.Api.Services
 
             if (priceWasSaved)
             {
-                Console.WriteLine(
-                    $"Saved gold price with ID: {entity.Id}");
+                _logger.LogInformation(
+                    "Saved gold price with ID: {Id}",
+                    entity.Id);
             }
 
-            Console.WriteLine(
-                $"Gold price: {goldPrice.CurrencySymbol}" +
-                $"{goldPrice.Price} {goldPrice.Currency}");
+            _logger.LogInformation(
+                "Gold price: {Symbol}{Price} {Currency}",
+                goldPrice.CurrencySymbol,
+                goldPrice.Price,
+                goldPrice.Currency);
+        }
+
+        private async Task TryFetchAndProcessGoldPrice(
+            CancellationToken stoppingToken)
+        {
+            try
+            {
+                await FetchAndProcessGoldPrice(stoppingToken);
+            }
+            catch (OperationCanceledException)
+                when (stoppingToken.IsCancellationRequested)        
+            {
+                _logger.LogInformation("Gold price background service is stopping.");
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(
+                    ex,
+                    "Failed to fetch and process gold price.");
+            }
         }
     }
 }
