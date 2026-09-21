@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Security.Claims;
 using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authorization;
 
 namespace GoldPriceTracker.Api.Controllers
 {
@@ -71,10 +72,33 @@ namespace GoldPriceTracker.Api.Controllers
                 new Claim(ClaimTypes.Name, user.UserName)
             };
 
-            var identy = new ClaimsIdentity(claims, "Cookies");
-            var principal = new ClaimsPrincipal(identy);
+            var identity = new ClaimsIdentity(claims, "Cookies");
+            var principal = new ClaimsPrincipal(identity);
 
             await HttpContext.SignInAsync("Cookies", principal);
+
+            return Ok();
+        }
+
+        [Authorize]
+        [HttpGet("me")]
+        public IActionResult Me()
+        {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var userName = User.FindFirstValue(ClaimTypes.Name);
+
+            return Ok(new
+            {
+                userId,
+                userName
+            });
+        }
+
+        [Authorize]
+        [HttpPost("logout")]
+        public async Task<IActionResult> Logout()
+        {
+            await HttpContext.SignOutAsync("Cookies");
 
             return Ok();
         }
