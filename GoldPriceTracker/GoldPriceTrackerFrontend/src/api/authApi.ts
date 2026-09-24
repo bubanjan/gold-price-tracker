@@ -1,5 +1,6 @@
 import type { CurrentUser } from "../types/CurrentUser";
 import type { LoginRequest } from "../types/LoginRequest";
+import type { RegisterRequest } from "../types/RegisterRequest";
 
 const url = 'https://localhost:7111/api/auth';
 
@@ -35,6 +36,20 @@ export const login = async (request: LoginRequest): Promise<void> => {
 
     if (!response.ok) {
         throw new Error('Failed to log in');
+    }
+};
+
+export const register = async (request: RegisterRequest): Promise<void> => {
+    const response = await fetch(`${url}/register`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(request),
+    });
+
+    if (!response.ok) {
+        throw new Error('Failed to register user');
     }
 };
 

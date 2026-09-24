@@ -10,8 +10,13 @@ import {
 import { useCurrentUser } from '../hooks/useCurrentUser';
 import { useLogout } from '../hooks/useLogout';
 import LoginForm from './LoginForm';
+import { useState } from 'react';
+import RegisterForm from './RegisterForm';
 
 function AuthBar() {
+
+    const [showRegister, setShowRegister] = useState(false);
+
     const {
         data: currentUser,
         isLoading
@@ -75,7 +80,23 @@ function AuthBar() {
                             </Button>
                         </Box>
                     ) : (
-                        <LoginForm />
+                        <Box>
+                            {showRegister ? (
+                                <RegisterForm onRegisterSuccess={() => setShowRegister(false)} />
+                            ) : (
+                                <LoginForm />
+                            )}
+
+                            <Button
+                                size="small"
+                                onClick={() => setShowRegister(!showRegister)}
+                                sx={{ mt: 1 }}
+                            >
+                                {showRegister
+                                    ? 'Already have an account? Login'
+                                    : 'No account? Register'}
+                            </Button>
+                        </Box>
                     )}
                 </Box>
             </CardContent>
