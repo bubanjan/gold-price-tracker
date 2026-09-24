@@ -17,6 +17,7 @@ import {
     usePriceAlerts,
     useUpdatePriceAlert
 } from '../hooks/usePriceAlerts';
+import { useCurrentUser } from '../hooks/useCurrentUser';
 
 function PriceAlerts() {
 
@@ -25,11 +26,13 @@ function PriceAlerts() {
     const [editingId, setEditingId] = useState<number | null>(null);
     const [targetPriceError, setTargetPriceError] = useState('');
 
+    const { data: currentUser, isLoading: isLoadingCurrentUser } = useCurrentUser();
+
     const {
         data: alerts,
         isLoading,
         isError
-    } = usePriceAlerts();
+    } = usePriceAlerts(!!currentUser);
 
     const createMutation = useCreatePriceAlert();
 
@@ -110,6 +113,22 @@ function PriceAlerts() {
 
     if (isLoading) {
         return <Typography>Loading alerts...</Typography>;
+    }
+
+    if (isLoadingCurrentUser) {
+        return (
+            <Typography>
+                Checking user...
+            </Typography>
+        );
+    }
+
+    if (!currentUser) {
+        return (
+            <Alert severity="info">
+                Log in to manage price alerts.
+            </Alert>
+        );
     }
 
     if (isError) {

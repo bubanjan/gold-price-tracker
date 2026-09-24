@@ -1,12 +1,15 @@
 ﻿using GoldPriceTracker.Api.Data;
 using GoldPriceTracker.Api.Entities;
 using GoldPriceTracker.Api.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System.Security.Claims;
 
 namespace GoldPriceTracker.Api.Controllers
 {
+    [Authorize]
     [Route("api/pricealerts")]
     [ApiController]
     public class PriceAlertsController : ControllerBase
@@ -21,7 +24,10 @@ namespace GoldPriceTracker.Api.Controllers
         [HttpGet]
         public async Task<ActionResult<List<PriceAlert>>> GetAll()
         {
+            var userId = GetCurrentUserId();
+
             var alerts = await _dbContext.PriceAlerts
+                .Where(x => x.UserId == userId)
                 .OrderByDescending(x => x.CreatedAt)
                 .ToListAsync();
 
@@ -31,13 +37,16 @@ namespace GoldPriceTracker.Api.Controllers
         [HttpPost]
         public async Task<ActionResult<PriceAlert>> Create(CreatePriceAlertRequest request)
         {
+            var userId = GetCurrentUserId();
+
             var alert = new PriceAlert
             {
                 TargetPrice = request.TargetPrice,
                 Condition = request.Condition,
                 IsActive = true,
                 IsTriggered = false,
-                CreatedAt = DateTime.UtcNow
+                CreatedAt = DateTime.UtcNow,
+                UserId = userId
             };
 
             _dbContext.PriceAlerts.Add(alert);
@@ -54,7 +63,9 @@ namespace GoldPriceTracker.Api.Controllers
         [HttpGet("{id}")]
         public async Task<ActionResult<PriceAlert>> GetById(int id)
         {
-            var alert = await _dbContext.PriceAlerts.FindAsync(id);
+            var userId = GetCurrentUserId();
+
+            var alert = await _dbContext.PriceAlerts.FirstOrDefaultAsync(x => x.Id == id && x.UserId == userId);
 
             if (alert is null)
             {
@@ -69,7 +80,9 @@ namespace GoldPriceTracker.Api.Controllers
             int id,
             UpdatePriceAlertRequest request)
         {
-            var alert = await _dbContext.PriceAlerts.FindAsync(id);
+            var userId = GetCurrentUserId();
+
+            var alert = await _dbContext.PriceAlerts.FirstOrDefaultAsync(x => x.Id == id && x.UserId == userId);
 
             if (alert is null)
             {
@@ -91,7 +104,9 @@ namespace GoldPriceTracker.Api.Controllers
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(int id)
         {
-            var alert = await _dbContext.PriceAlerts.FindAsync(id);
+            var userId = GetCurrentUserId();
+
+            var alert = await _dbContext.PriceAlerts.FirstOrDefaultAsync(x => x.Id == id && x.UserId == userId);
 
             if (alert is null)
             {
@@ -104,5 +119,11 @@ namespace GoldPriceTracker.Api.Controllers
 
             return NoContent();
         }
+
+        private int GetCurrentUserId()
+        {
+            return int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+        }
+
     }
 }

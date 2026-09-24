@@ -28,7 +28,9 @@ const getErrorMessage = async (response: Response): Promise<string> => {
 
 
 export const getPriceAlerts = async (): Promise<PriceAlert[]> => {
-    const response = await fetch(url);
+    const response = await fetch(url, {
+        credentials: 'include',
+    });
 
     if (!response.ok) {
         const message = await getErrorMessage(response);
@@ -46,6 +48,7 @@ export const createPriceAlert = async (
         headers: {
             'Content-Type': 'application/json',
         },
+        credentials: 'include',
         body: JSON.stringify(request),
     });
 
@@ -62,6 +65,7 @@ export const deletePriceAlert = async (
 ): Promise<void> => {
     const response = await fetch(`${url}/${id}`, {
         method: 'DELETE',
+        credentials: 'include',
     });
 
     if (!response.ok) {
@@ -84,6 +88,7 @@ export const updatePriceAlert = async ({
         headers: {
             'Content-Type': 'application/json',
         },
+        credentials: 'include',
         body: JSON.stringify(request),
     });
 

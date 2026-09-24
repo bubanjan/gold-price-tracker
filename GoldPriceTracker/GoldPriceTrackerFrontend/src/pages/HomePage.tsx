@@ -12,6 +12,9 @@ import {
 } from '@mui/material';
 import PriceAlerts from '../components/PriceAlerts';
 import { useGoldPrice } from '../hooks/useGoldPrice';
+import { useCurrentUser } from '../hooks/useCurrentUser';
+import LoginForm from '../components/LoginForm';
+import AuthBar from '../components/AuthBar';
 
 function HomePage() {
     const {
@@ -47,6 +50,8 @@ function HomePage() {
 
     return (
         <Container maxWidth="lg" sx={{ mt: 5 }}>
+
+            <AuthBar />
 
             <Box
                 sx={{

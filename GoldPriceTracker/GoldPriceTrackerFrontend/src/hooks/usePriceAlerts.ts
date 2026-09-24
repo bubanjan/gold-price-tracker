@@ -11,11 +11,12 @@ import {
     updatePriceAlert
 } from '../api/priceAlertsApi';
 
-export const usePriceAlerts = () => {
+export const usePriceAlerts = (enabled: boolean) => {
     return useQuery({
         queryKey: ['priceAlerts'],
         queryFn: getPriceAlerts,
         refetchInterval: 5000,
+        enabled: enabled
     });
 };
 
