@@ -1,5 +1,6 @@
 ﻿using GoldPriceTracker.Api.Data;
 using GoldPriceTracker.Api.Entities;
+using GoldPriceTracker.Api.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -30,6 +31,25 @@ namespace GoldPriceTracker.Api.Controllers
                 .ToListAsync(cancellationToken);
 
             return Ok(notifications);
+        }
+
+        [HttpPatch("{id}/read")]
+        public async Task<IActionResult> UpdateIsRead(int id)
+        {
+            var userId = GetCurrentUserId();
+
+            var notification = await _dbContext.Notifications.FirstOrDefaultAsync(x => x.Id == id && x.UserId == userId);
+
+            if (notification is null)
+            {
+                return NotFound();
+            }
+
+            notification.IsRead = true;
+
+            await _dbContext.SaveChangesAsync();
+
+            return NoContent();
         }
 
         private int GetCurrentUserId()

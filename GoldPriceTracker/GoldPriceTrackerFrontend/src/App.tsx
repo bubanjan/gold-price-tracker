@@ -7,6 +7,7 @@ import {
 
 import HomePage from './pages/HomePage';
 import HistoryPage from './pages/HistoryPage';
+import NotificationsPage from './pages/NotificationsPage';
 
 const theme = createTheme({
   palette: {
@@ -29,6 +30,7 @@ function App() {
       <Routes>
         <Route path="/" element={<HomePage />} />
         <Route path="/history" element={<HistoryPage />} />
+        <Route path="/notifications" element={<NotificationsPage />} />
       </Routes>
     </ThemeProvider>
   );

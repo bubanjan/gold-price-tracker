@@ -102,6 +102,15 @@ function HomePage() {
                             View History
                         </Button>
 
+                        <Button
+                            component={Link}
+                            to="/notifications"
+                            variant="contained"
+                            sx={{ backgroundColor: "yellow" }}
+                        >
+                            My notifications
+                        </Button>
+
                     </Stack>
                 </Box>
 
