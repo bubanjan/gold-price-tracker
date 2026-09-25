@@ -14,5 +14,7 @@ namespace GoldPriceTracker.Api.Entities
         public string PasswordHash { get; set; } = string.Empty;
 
         public ICollection<PriceAlert> PriceAlerts { get; set; } = new List<PriceAlert>();
+
+        public ICollection<Notification> Notifications { get; set; } = new List<Notification>();
     }
 }

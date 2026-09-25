@@ -22,5 +22,6 @@ namespace GoldPriceTracker.Api.Data
         public DbSet<GoldPrice> GoldPrices { get; set; }
         public DbSet<PriceAlert> PriceAlerts { get; set; }
         public DbSet<User> Users { get; set; }
+        public DbSet<Notification> Notifications { get; set; }
     }
 }

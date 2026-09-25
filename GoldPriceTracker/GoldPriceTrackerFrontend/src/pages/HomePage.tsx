@@ -12,8 +12,6 @@ import {
 } from '@mui/material';
 import PriceAlerts from '../components/PriceAlerts';
 import { useGoldPrice } from '../hooks/useGoldPrice';
-import { useCurrentUser } from '../hooks/useCurrentUser';
-import LoginForm from '../components/LoginForm';
 import AuthBar from '../components/AuthBar';
 
 function HomePage() {

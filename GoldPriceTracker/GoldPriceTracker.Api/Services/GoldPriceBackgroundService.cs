@@ -1,5 +1,6 @@
 ﻿using GoldPriceTracker.Api.Data;
 using GoldPriceTracker.Api.Entities;
+using GoldPriceTracker.Api.Messages;
 using Microsoft.EntityFrameworkCore;
 
 namespace GoldPriceTracker.Api.Services
@@ -10,17 +11,20 @@ namespace GoldPriceTracker.Api.Services
         private readonly GoldPriceStore _goldPriceStore;
         private readonly IServiceScopeFactory _scopeFactory;
         private readonly ILogger<GoldPriceBackgroundService> _logger;
+        private readonly NotificationChannel _notificationChannel;
 
         public GoldPriceBackgroundService(
             GoldApiClient goldApiClient,
             GoldPriceStore goldPriceStore,
             IServiceScopeFactory scopeFactory,
-            ILogger<GoldPriceBackgroundService> logger)
+            ILogger<GoldPriceBackgroundService> logger,
+            NotificationChannel notificationChannel)
         {
             _goldApiClient = goldApiClient;
             _goldPriceStore = goldPriceStore;
             _scopeFactory = scopeFactory;
             _logger = logger;
+            _notificationChannel = notificationChannel;
         }
 
         protected override async Task ExecuteAsync(
@@ -83,18 +87,33 @@ namespace GoldPriceTracker.Api.Services
 
             foreach (var pa in priceAlerts)
             {
-                if (pa.Condition == AlertCondition.Above &&
-                    entity.Price > pa.TargetPrice)
+                var triggered = false;
+
+                if (pa.Condition == AlertCondition.Above && entity.Price > pa.TargetPrice)
                 {
-                    pa.IsTriggered = true;
-                    pa.TriggeredAt = DateTime.UtcNow;
+                    triggered = true;
                 }
 
-                if (pa.Condition == AlertCondition.Below &&
-                    entity.Price < pa.TargetPrice)
+                if (pa.Condition == AlertCondition.Below && entity.Price < pa.TargetPrice)
+                {
+                    triggered = true;
+                }
+
+                if (triggered)
                 {
                     pa.IsTriggered = true;
                     pa.TriggeredAt = DateTime.UtcNow;
+
+                    var message = new PriceAlertTriggered
+                    {
+                        UserId = pa.UserId,
+                        PriceAlertId = pa.Id,
+                        TargetPrice = pa.TargetPrice,
+                        TriggeredPrice = entity.Price,
+                        Condition = pa.Condition
+                    };
+
+                    await _notificationChannel.Writer.WriteAsync(message, stoppingToken);
                 }
             }
 

@@ -1,13 +1,9 @@
-import type {
-    CreatePriceAlertRequest,
-    PriceAlert,
-    UpdatePriceAlertRequest
-} from '../types/PriceAlert';
-import { getErrorMessage } from './apiError';
+import type { UserNotification } from "../types/UserNotification";
+import { getErrorMessage } from "./apiError";
 
-const url = 'https://localhost:7111/api/pricealerts';
+const url = 'https://localhost:7111/api/notifications';
 
-export const getPriceAlerts = async (): Promise<PriceAlert[]> => {
+export const getNotifications = async (): Promise<UserNotification[]> => {
     const response = await fetch(url, {
         credentials: 'include',
     });
@@ -20,6 +16,7 @@ export const getPriceAlerts = async (): Promise<PriceAlert[]> => {
     return response.json();
 };
 
+/*
 export const createPriceAlert = async (
     request: CreatePriceAlertRequest
 ): Promise<PriceAlert> => {
@@ -77,3 +74,4 @@ export const updatePriceAlert = async ({
         throw new Error(message);
     }
 };
+*/

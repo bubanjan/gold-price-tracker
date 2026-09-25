@@ -23,6 +23,8 @@ builder.Services.AddHttpClient<GoldApiClient>();
 builder.Services.AddHostedService<GoldPriceBackgroundService>();
 builder.Services.AddSingleton<GoldPriceStore>();
 builder.Services.AddScoped<IPasswordHasher<User>, PasswordHasher<User>>();
+builder.Services.AddSingleton<NotificationChannel>();
+builder.Services.AddHostedService<NotificationBackgroundService>();
 
 builder.Services
     .AddAuthentication("Cookies")
