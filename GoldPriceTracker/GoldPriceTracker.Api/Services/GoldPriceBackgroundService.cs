@@ -1,7 +1,9 @@
 ﻿using GoldPriceTracker.Api.Data;
 using GoldPriceTracker.Api.Entities;
 using GoldPriceTracker.Api.Messages;
+using GoldPriceTracker.Api.Options;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 
 namespace GoldPriceTracker.Api.Services
 {
@@ -12,19 +14,22 @@ namespace GoldPriceTracker.Api.Services
         private readonly IServiceScopeFactory _scopeFactory;
         private readonly ILogger<GoldPriceBackgroundService> _logger;
         private readonly NotificationChannel _notificationChannel;
+        private readonly GoldPriceWorkerOptions _options;
 
         public GoldPriceBackgroundService(
             GoldApiClient goldApiClient,
             GoldPriceStore goldPriceStore,
             IServiceScopeFactory scopeFactory,
             ILogger<GoldPriceBackgroundService> logger,
-            NotificationChannel notificationChannel)
+            NotificationChannel notificationChannel,
+            IOptions<GoldPriceWorkerOptions> options)
         {
             _goldApiClient = goldApiClient;
             _goldPriceStore = goldPriceStore;
             _scopeFactory = scopeFactory;
             _logger = logger;
             _notificationChannel = notificationChannel;
+            _options = options.Value;
         }
 
         protected override async Task ExecuteAsync(
@@ -32,7 +37,7 @@ namespace GoldPriceTracker.Api.Services
         {
             await TryFetchAndProcessGoldPrice(stoppingToken);
 
-            using var timer = new PeriodicTimer(TimeSpan.FromSeconds(60));
+            using var timer = new PeriodicTimer(TimeSpan.FromSeconds(_options.PollingIntervalSeconds));
 
             try
             {

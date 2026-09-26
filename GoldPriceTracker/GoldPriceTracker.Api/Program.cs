@@ -1,5 +1,6 @@
 using GoldPriceTracker.Api.Data;
 using GoldPriceTracker.Api.Entities;
+using GoldPriceTracker.Api.Options;
 using GoldPriceTracker.Api.Services;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -25,6 +26,8 @@ builder.Services.AddSingleton<GoldPriceStore>();
 builder.Services.AddScoped<IPasswordHasher<User>, PasswordHasher<User>>();
 builder.Services.AddSingleton<NotificationChannel>();
 builder.Services.AddHostedService<NotificationBackgroundService>();
+
+builder.Services.Configure<GoldPriceWorkerOptions>(builder.Configuration.GetSection("GoldPriceWorker"));
 
 builder.Services
     .AddAuthentication("Cookies")

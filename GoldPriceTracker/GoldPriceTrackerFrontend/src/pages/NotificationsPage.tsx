@@ -24,17 +24,11 @@ function NotificationsPage() {
     const updateIsReadMutation = useUpdateIsRead();
 
     const handleUpdateIsRead = (id: number) => {
-
         updateIsReadMutation.mutate(id);
-
-    }
+    };
 
     if (isLoadingCurrentUser) {
-        return (
-            <Typography>
-                Checking user...
-            </Typography>
-        );
+        return <Typography>Checking user...</Typography>;
     }
 
     if (!currentUser) {
@@ -49,7 +43,6 @@ function NotificationsPage() {
         return <Typography>Loading notifications...</Typography>;
     }
 
-
     if (isError) {
         return (
             <Typography color="error">
@@ -58,92 +51,128 @@ function NotificationsPage() {
         );
     }
 
-
     return (
-        <Stack spacing={3} sx={{ mt: 2 }}>
-
-            <Typography variant="h5">
-                Notifications
-            </Typography>
-
-            <Button
-                component={Link}
-                to="/"
-                variant="outlined"
-                sx={{ mb: 2 }}
-            >
-                Back to Current Price
-            </Button>
-
-
-            {
-                notifications?.length === 0 && (
-                    <Typography>
-                        No notifications yet.
-                    </Typography>
-                )
-            }
-
+        <Stack
+            spacing={3}
+            sx={{
+                mt: 3,
+                maxWidth: 750,
+                mx: 'auto',
+                width: '100%'
+            }}
+        >
             <Stack
-                spacing={2}
+                direction="row"
+
                 sx={{
-                    maxHeight: 350,
-                    overflowY: 'auto',
-                    border: 1,
-                    borderColor: 'divider',
-                    borderRadius: 1,
-                    p: 2,
-                }}>
-                {notifications?.map((notification) => (
-                    <Stack
-                        key={notification.id}
-                        spacing={1}
-                        sx={{
-                            backgroundColor: 'darkblue',
-                            border: '2px solid',
-                            borderColor: 'yellow',
-                            borderRadius: 2,
-                            p: 2,
-                            color: 'white'
-                        }}
-                    >
+                    alignItems: 'center',             // CSS
+                    justifyContent: 'space-between'   // CSS
+                }}
+            >
+                <Typography variant="h4">
+                    Notifications
+                </Typography>
+
+                <Button
+                    component={Link}
+                    to="/"
+                    variant="outlined"
+                    size="small"
+                    sx={{ ml: 2 }}
+                >
+                    Back to Current Price
+                </Button>
+            </Stack>
+
+            {notifications?.length === 0 ? (
+                <Alert severity="info">
+                    No notifications yet.
+                </Alert>
+            ) : (
+                <Stack
+                    spacing={1.5}
+                    sx={{
+                        maxHeight: 500,
+                        overflowY: 'auto',
+                        pr: 1
+                    }}
+                >
+                    {notifications?.map((notification) => (
                         <Stack
-                            direction="row"
-                            spacing={2}
+                            key={notification.id}
+                            spacing={1.5}
                             sx={{
-                                alignItems: 'center',
-                                justifyContent: 'space-between'
+                                p: 2,
+                                borderRadius: 2,
+                                border: '1px solid',
+                                borderColor: notification.isRead
+                                    ? 'divider'
+                                    : 'warning.main',
+                                backgroundColor: notification.isRead
+                                    ? 'background.paper'
+                                    : 'action.hover',
+                                opacity: notification.isRead ? 0.7 : 1,
+                                transition: '0.2s'
                             }}
                         >
-                            <Typography variant="h6">
-                                {notification.condition} ${notification.targetPrice}
+                            <Stack
+                                spacing={2}
+                                sx={{
+                                    alignItems: {
+                                        xs: 'flex-start',
+                                        sm: 'center'
+                                    },
+                                    justifyContent: 'space-between'
+                                }}
+                            >
+                                <Stack spacing={0.5}>
+                                    <Typography
+                                        variant="h6"
+                                        color={
+                                            notification.condition === 'Above'
+                                                ? 'success.main'
+                                                : 'error.main'
+                                        }
+                                    >
+                                        Price {notification.condition.toLowerCase()} target
+                                    </Typography>
+
+                                    <Typography variant="body2" color="text.secondary">
+                                        Target: ${notification.targetPrice}
+                                    </Typography>
+                                </Stack>
+
+                                <Typography
+                                    variant="h6"
+                                    sx={{ fontWeight: 700 }}
+                                >
+                                    ${notification.triggeredPrice}
+                                </Typography>
+
+                                <Chip
+                                    label={notification.isRead ? 'Read' : 'Mark as read'}
+                                    size="small"
+                                    variant={notification.isRead ? 'outlined' : 'filled'}
+                                    color={notification.isRead ? 'default' : 'warning'}
+                                    clickable={!notification.isRead}
+                                    onClick={
+                                        !notification.isRead
+                                            ? () => handleUpdateIsRead(notification.id)
+                                            : undefined
+                                    }
+                                />
+                            </Stack>
+
+                            <Typography
+                                variant="caption"
+                                color="text.secondary"
+                            >
+                                Triggered {new Date(notification.createdAt).toLocaleString()}
                             </Typography>
-
-                            <Typography variant="body1">
-                                Triggered at: ${notification.triggeredPrice}
-                            </Typography>
-
-                            <Chip
-                                label={
-                                    notification.isRead
-                                        ? 'Read'
-                                        : 'Not read'
-                                }
-
-                                size="small"
-                                onClick={!notification.isRead ? () => handleUpdateIsRead(notification.id) : undefined}
-                                sx={{ color: notification.isRead ? "white" : "gray" }}
-                            />
                         </Stack>
-
-                        <Typography variant="body2">
-                            Created:{' '}
-                            {new Date(notification.createdAt).toLocaleString()}
-                        </Typography>
-
-                    </Stack>
-                ))}
-            </Stack>
+                    ))}
+                </Stack>
+            )}
         </Stack>
     );
 }
