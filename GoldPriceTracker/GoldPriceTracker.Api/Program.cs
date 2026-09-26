@@ -20,7 +20,10 @@ builder.Services.AddControllers()
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
 
-builder.Services.AddHttpClient<GoldApiClient>();
+builder.Services
+    .AddHttpClient<GoldApiClient>()
+    .AddStandardResilienceHandler();
+
 builder.Services.AddHostedService<GoldPriceBackgroundService>();
 builder.Services.AddSingleton<GoldPriceStore>();
 builder.Services.AddScoped<IPasswordHasher<User>, PasswordHasher<User>>();
