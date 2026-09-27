@@ -32,8 +32,8 @@ namespace GoldPriceTracker.Api.Controllers
 
         [HttpGet("history")]
         public async Task<IActionResult> GetHistory(
-            CancellationToken cancellationToken, 
-            [FromQuery] int page = 1, 
+            CancellationToken cancellationToken,
+            [FromQuery] int page = 1,
             [FromQuery] int pageSize = 20)
         {
             var totalCount = await _dbContext.GoldPrices.CountAsync(cancellationToken);
@@ -69,7 +69,7 @@ namespace GoldPriceTracker.Api.Controllers
         [HttpGet("chart")]
         public async Task<IActionResult> GetChart(int hours, CancellationToken cancellationToken)
         {
-            if(hours <1 || hours > 168)
+            if (hours < 1 || hours > 168)
             {
                 return BadRequest("Housr must be between 1 and 168.");
             }
