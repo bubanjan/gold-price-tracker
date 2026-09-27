@@ -1,5 +1,6 @@
 <Solution>
   <Project Path="GoldPriceTracker.Api/GoldPriceTracker.Api.csproj" />
+  <Project Path="GoldPriceTracker.Api.Tests/GoldPriceTracker.Api.Tests.csproj" />
   <Project Path="GoldPriceTrackerFrontend/GoldPriceTrackerFrontend.esproj">
     <Build />
     <Deploy />
