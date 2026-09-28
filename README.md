@@ -48,3 +48,28 @@ Price alerts are processed in the background. When an alert is triggered, a mess
 ## Key Concepts
 
 This project demonstrates practical use of background workers, producer/consumer messaging, dependency injection, configuration with `IOptions`, HTTP resilience, authentication and authorization, asynchronous programming, TanStack Query server-state management, and full-stack automated testing.
+
+## How to Run the Application
+
+### Backend
+
+1. Open `GoldPriceTracker.slnx` in Visual Studio.
+2. Set `GoldPriceTracker.Api` as the startup project.
+3. Run the application.
+
+### Frontend
+
+1. Navigate to the `GoldPriceTrackerFrontend` folder.
+2. Install the dependencies:
+
+```bash
+npm install
+```
+
+3. Start the Vite development server:
+
+```bash
+npm run dev
+```
+
+The frontend will be available at `https://localhost:5173`.
