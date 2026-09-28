@@ -24,11 +24,14 @@ builder.Services
     .AddHttpClient<GoldApiClient>()
     .AddStandardResilienceHandler();
 
-builder.Services.AddHostedService<GoldPriceBackgroundService>();
+if (builder.Configuration.GetValue<bool>("BackgroundWorkers:Enabled", true))
+{
+    builder.Services.AddHostedService<GoldPriceBackgroundService>();
+    builder.Services.AddHostedService<NotificationBackgroundService>();
+}
 builder.Services.AddSingleton<GoldPriceStore>();
 builder.Services.AddScoped<IPasswordHasher<User>, PasswordHasher<User>>();
 builder.Services.AddSingleton<NotificationChannel>();
-builder.Services.AddHostedService<NotificationBackgroundService>();
 
 builder.Services.AddHealthChecks();
 

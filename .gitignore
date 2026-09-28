@@ -316,6 +316,8 @@ FakesAssemblies/
 *.GhostDoc.xml
 
 # Node.js Tools for Visual Studio
+test-results/
+playwright-report/
 .ntvs_analysis.dat
 node_modules/
 
