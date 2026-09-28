@@ -3,7 +3,6 @@ using GoldPriceTracker.Api.Data;
 using GoldPriceTracker.Api.Entities;
 using GoldPriceTracker.Api.Models;
 using GoldPriceTracker.Api.Services;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;

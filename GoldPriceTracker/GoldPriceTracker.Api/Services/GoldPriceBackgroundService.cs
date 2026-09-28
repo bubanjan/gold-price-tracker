@@ -159,7 +159,7 @@ namespace GoldPriceTracker.Api.Services
                 await FetchAndProcessGoldPrice(stoppingToken);
             }
             catch (OperationCanceledException)
-                when (stoppingToken.IsCancellationRequested)        
+                when (stoppingToken.IsCancellationRequested)
             {
                 _logger.LogInformation("Gold price background service is stopping.");
             }

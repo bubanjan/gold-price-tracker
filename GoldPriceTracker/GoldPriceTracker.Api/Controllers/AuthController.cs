@@ -1,12 +1,12 @@
 ﻿using GoldPriceTracker.Api.Data;
 using GoldPriceTracker.Api.Entities;
 using GoldPriceTracker.Api.Models;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Security.Claims;
-using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.Authorization;
 
 namespace GoldPriceTracker.Api.Controllers
 {
@@ -17,7 +17,7 @@ namespace GoldPriceTracker.Api.Controllers
         private readonly AppDbContext _dbContext;
         private readonly IPasswordHasher<User> _passwordHasher;
 
-        public AuthController(AppDbContext dbContext,  IPasswordHasher<User> passwordHasher)
+        public AuthController(AppDbContext dbContext, IPasswordHasher<User> passwordHasher)
         {
             _dbContext = dbContext;
             _passwordHasher = passwordHasher;
@@ -28,7 +28,8 @@ namespace GoldPriceTracker.Api.Controllers
             RegisterRequest request,
             CancellationToken cancellationToken)
         {
-            if (await _dbContext.Users.AnyAsync(x => x.UserName == request.UserName, cancellationToken)) {
+            if (await _dbContext.Users.AnyAsync(x => x.UserName == request.UserName, cancellationToken))
+            {
 
                 return Conflict("Username already exists.");
             }
@@ -61,7 +62,8 @@ namespace GoldPriceTracker.Api.Controllers
 
             var verificationResult = _passwordHasher.VerifyHashedPassword(user, user.PasswordHash, request.Password);
 
-            if (verificationResult == PasswordVerificationResult.Failed) {
+            if (verificationResult == PasswordVerificationResult.Failed)
+            {
 
                 return Unauthorized();
             }

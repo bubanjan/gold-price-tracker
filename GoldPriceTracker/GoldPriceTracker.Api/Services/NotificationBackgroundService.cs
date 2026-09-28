@@ -20,7 +20,7 @@ namespace GoldPriceTracker.Api.Services
         {
             await foreach (var message in _notificationChannel.Reader.ReadAllAsync(stoppingToken))
             {
-                try 
+                try
                 {
                     using var scope = _scopeFactory.CreateScope();
 
@@ -43,7 +43,7 @@ namespace GoldPriceTracker.Api.Services
 
                     _logger.LogInformation("Notification created for price alert {PriceAlertId}", message.PriceAlertId);
                 }
-                catch (Exception ex) 
+                catch (Exception ex)
                 {
                     _logger.LogError(ex, "Failed to process notification for price alert {PriceAlertId}", message.PriceAlertId);
                 }
