@@ -14,7 +14,6 @@ namespace GoldPriceTracker.Api.Controllers
     {
         private readonly AppDbContext _dbContext;
         public NotificationsController(AppDbContext dbContext)
-
         {
             _dbContext = dbContext;
         }

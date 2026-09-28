@@ -11,8 +11,7 @@ namespace GoldPriceTracker.Api.Services
             _httpClient = httpClient;
         }
 
-        public async Task<GoldPriceResponse?> GetGoldPriceAsync(
-            CancellationToken cancellationToken)
+        public async Task<GoldPriceResponse?> GetGoldPriceAsync(CancellationToken cancellationToken)
         {
             return await _httpClient.GetFromJsonAsync<GoldPriceResponse>("https://api.gold-api.com/price/XAU", cancellationToken);
         }

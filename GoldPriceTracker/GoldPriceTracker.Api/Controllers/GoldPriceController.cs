@@ -39,10 +39,10 @@ namespace GoldPriceTracker.Api.Controllers
             var totalCount = await _dbContext.GoldPrices.CountAsync(cancellationToken);
 
             var history = await _dbContext.GoldPrices
-             .OrderByDescending(x => x.FetchedAt)
-             .Skip((page - 1) * pageSize)
-             .Take(pageSize)
-             .ToListAsync(cancellationToken);
+                .OrderByDescending(x => x.FetchedAt)
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
+                .ToListAsync(cancellationToken);
 
             var totalPages = (int)Math.Ceiling(totalCount / (double)pageSize);
 

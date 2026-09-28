@@ -32,8 +32,7 @@ namespace GoldPriceTracker.Api.Services
             _options = options.Value;
         }
 
-        protected override async Task ExecuteAsync(
-            CancellationToken stoppingToken)
+        protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
             await TryFetchAndProcessGoldPrice(stoppingToken);
 
@@ -49,16 +48,13 @@ namespace GoldPriceTracker.Api.Services
             catch (OperationCanceledException)
                 when (stoppingToken.IsCancellationRequested)
             {
-                _logger.LogInformation(
-                    "Gold price background service stopped.");
+                _logger.LogInformation("Gold price background service stopped.");
             }
         }
 
-        private async Task FetchAndProcessGoldPrice(
-            CancellationToken stoppingToken)
+        private async Task FetchAndProcessGoldPrice(CancellationToken stoppingToken)
         {
-            var goldPrice = await _goldApiClient
-                .GetGoldPriceAsync(stoppingToken);
+            var goldPrice = await _goldApiClient.GetGoldPriceAsync(stoppingToken);
 
             if (goldPrice is null)
             {
@@ -67,16 +63,12 @@ namespace GoldPriceTracker.Api.Services
                 return;
             }
 
-            // Keep the latest price in memory
             _goldPriceStore.Current = goldPrice;
 
-            // Create a scope for AppDbContext
             using var scope = _scopeFactory.CreateScope();
 
-            var dbContext = scope.ServiceProvider
-                .GetRequiredService<AppDbContext>();
+            var dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
 
-            // Convert API response DTO → database entity
             var entity = new GoldPrice
             {
                 Price = goldPrice.Price,
@@ -139,9 +131,7 @@ namespace GoldPriceTracker.Api.Services
 
             if (priceWasSaved)
             {
-                _logger.LogInformation(
-                    "Saved gold price with ID: {Id}",
-                    entity.Id);
+                _logger.LogInformation("Saved gold price with ID: {Id}", entity.Id);
             }
 
             _logger.LogInformation(
@@ -151,8 +141,7 @@ namespace GoldPriceTracker.Api.Services
                 goldPrice.Currency);
         }
 
-        private async Task TryFetchAndProcessGoldPrice(
-            CancellationToken stoppingToken)
+        private async Task TryFetchAndProcessGoldPrice(CancellationToken stoppingToken)
         {
             try
             {

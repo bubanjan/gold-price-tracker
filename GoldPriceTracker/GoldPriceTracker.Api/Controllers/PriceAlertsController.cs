@@ -52,11 +52,7 @@ namespace GoldPriceTracker.Api.Controllers
 
             await _dbContext.SaveChangesAsync();
 
-            return CreatedAtAction(
-                nameof(GetById),
-                new { id = alert.Id },
-                alert
-            );
+            return CreatedAtAction(nameof(GetById), new { id = alert.Id }, alert);
         }
 
         [HttpGet("{id}")]
